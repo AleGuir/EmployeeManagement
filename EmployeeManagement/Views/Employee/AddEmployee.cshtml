@@ -1,0 +1,113 @@
+﻿@model EmployeeManagement.Models.Employee
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create Employee</h2>
+
+@using (Html.BeginForm()){
+    @Html.AntiForgeryToken()
+<form id="employeeForm" class="form-horizontal">
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", id = "Name" } })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            <span class="text-danger" id="NameError"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Position, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Position, new { htmlAttributes = new { @class = "form-control", id = "Position" } })
+            @Html.ValidationMessageFor(model => model.Position, "", new { @class = "text-danger" })
+
+            <span class="text-danger" id="PositionError"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Office, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Office, new { htmlAttributes = new { @class = "form-control", id = "Office" } })
+            @Html.ValidationMessageFor(model => model.Office, "", new { @class = "text-danger" })
+
+            <span class="text-danger" id="OfficeError"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Salary, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Salary, new { htmlAttributes = new { @class = "form-control", id = "Salary" } })
+            @Html.ValidationMessageFor(model => model.Salary, "", new { @class = "text-danger" })
+            <span class="text-danger" id="SalaryError"></span>
+        </div>
+    </div>
+
+    <br />
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="submit" class="btn btn-success">Create Employee</button> |
+            @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
+        </div>
+    </div>
+</form>
+
+}
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+
+<script type="text/javascript">
+$(document).ready(function () {
+            $('#employeeForm').submit(function (event) {
+                event.preventDefault();
+
+                // Limpiar mensajes de error previos
+                $('#NameError').text('');
+                $('#PositionError').text('');
+                $('#OfficeError').text('');
+                $('#SalaryError').text('');
+
+                if (salary === "" || isNaN(salary) || parseFloat(salary) <= 0) {
+                    $('#SalaryError').text('Salary must be a positive decimal value.');
+                    isValid = false;
+                }
+
+
+                // Enviar información del Form usando AJAX
+                var formData = $(this).serialize();
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("AddEmployee", "Employee")', 
+                    data: formData,
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.href = '@Url.Action("Index", "Employee")';
+                        } else {
+
+                            // Display validation errors
+                            if (response.errors) {
+                                $.each(response.errors, function (key, value) {
+                                    $('#' + key + 'Error').text(value[0]);
+                                });
+                            } else {
+                                alert('Error: ' + response.message);
+                            }
+                        }
+                    },
+                    error: function () {
+                        alert('An error occurred while processing your request.');
+                    }
+                });
+            });
+        });
+</script>
+}

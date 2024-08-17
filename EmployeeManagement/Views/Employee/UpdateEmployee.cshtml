@@ -1,0 +1,129 @@
+﻿@model EmployeeManagement.Models.Employee
+
+@{
+    ViewBag.Title = "UpdateEmployee";
+}
+
+<h2>Update Employee</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    <h4>Employee</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.Id)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+            <span class="text-danger" id="nameError"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Position, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Position, new { htmlAttributes = new { @class = "form-control" } })
+            <span class="text-danger" id="positionError"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+            @Html.LabelFor(model => model.Office, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Office, new { htmlAttributes = new { @class = "form-control" } })
+                <span class="text-danger" id="officeError"></span>
+            </div>
+        </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Salary, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Salary, new { htmlAttributes = new { @class = "form-control" } })
+            <span class="text-danger" id="salaryError"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <br />
+            <input type="button" value="Save" id="saveButton" class="btn btn-primary" /> |
+            @Html.ActionLink("Back to top", "Index", null, new { @class = "btn btn-secondary" })
+        </div>
+    </div>
+</div>
+}
+<br />
+<div>
+    @Html.ActionLink("Back to top", "Index", null, new { @class = "btn btn-secondary" })
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function () {
+            $("#saveButton").click(function (e) {
+                e.preventDefault();
+
+                // Limpiar mensajes de error previos
+                $(".text-danger").text("");
+
+                var isValid = true;
+                var name = $("#Name").val().trim();
+                var position = $("#Position").val().trim();
+                var office = $("#Office").val().trim();
+                var salary = $("#Salary").val().trim();
+
+                // Validaciones simples
+                if (name === "") {
+                    $("#nameError").text("Name is required.");
+              
+                    isValid = false;
+                }
+
+                if (position === "") {
+                    $("#positionError").text("Position is required.");
+                    isValid = false;
+                }
+
+                if (office === "") {
+                    $("#officeError").text("Office is required.");
+                    isValid = false;
+                }
+
+                if (salary === "" || isNaN(parseFloat(salary)) || salary <= 0) {
+                    $("#salaryError").text("Valid Salary is required.");
+                    isValid = false;
+                }
+
+                // Si el formulario es válido, enviar los datos usando AJAX
+                if (isValid) {
+                    $.ajax({
+                        url: '@Url.Action("UpdateEmployee", "Employee")',
+                        type: 'POST',
+                        data: {
+                            Id: $("#Id").val(),
+                            Name: name,
+                            Position: position,
+                            Office: office,
+                            Salary: salary,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function (response) {
+                            alert("Employee updated successfully.");
+                            window.location.href = '@Url.Action("Index", "Employee")';
+                        },
+                        error: function (xhr, status, error) {
+                            alert("An error occurred while updating the employee: " + error);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
